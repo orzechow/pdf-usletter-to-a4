@@ -1,0 +1,41 @@
+#!/usr/bin/python
+# coding=utf-8
+
+import argparse
+import subprocess
+import os
+
+if __name__ == '__main__':
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Convert US letter PDFs to A4 PDFs.')
+    parser.add_argument('inputfiles',
+                        nargs='+',
+                        type=argparse.FileType('r'),
+                        help='PDF files to convert (at least one)')
+    parser.add_argument('--margins',
+                        default='28.34677',
+                        type=str,
+                        help='Margin argument passed to pdfcrop in bp units '
+                             '(see http://tex.stackexchange.com/a/8337/48855 for unit conversion). '
+                             'Defaults to 28.34677≈1cm')
+    args = parser.parse_args()
+
+    for input_file in args.inputfiles:
+        file_name_parts = input_file.name.rpartition('.')
+        cropped_file_name = file_name_parts[0] + '-tmp1.' + file_name_parts[2]
+        scaled_file_name = file_name_parts[0] + '-tmp2.' + file_name_parts[2]
+        output_file_name = file_name_parts[0] + '-a4.' + file_name_parts[2]
+
+        # Crop margins
+        subprocess.check_call(['pdfcrop', input_file.name, cropped_file_name])
+
+        # Scale pages to A4
+        subprocess.check_call(['gs', '-q', '-dNOPAUSE', '-dBATCH', '-sDEVICE=pdfwrite', '-sPAPERSIZE=a4',
+                               '-dFIXEDMEDIA', '-dPDFFitPage', '-sOutputFile=' + scaled_file_name, cropped_file_name])
+
+        # Add margins
+        subprocess.check_call(['pdfcrop', '--margins', args.margins, '--noclip', scaled_file_name, output_file_name])
+
+        # Remove temporary files
+        os.remove(cropped_file_name)
+        os.remove(scaled_file_name)
