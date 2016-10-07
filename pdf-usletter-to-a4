@@ -18,13 +18,26 @@ if __name__ == '__main__':
                         help='Margin argument passed to pdfcrop in bp units '
                              '(see http://tex.stackexchange.com/a/8337/48855 for unit conversion). '
                              'Defaults to 28.34677≈1cm')
+    parser.add_argument('-o',
+                        '--output',
+                        type=str,
+                        help='Output file name (ignored when multiple input files given)')
+    parser.add_argument('-p',
+                        '--print',
+                        action='store_true',
+                        dest='open_print_dialog',
+                        help='Open okular print dialog after conversion')
     args = parser.parse_args()
 
     for input_file in args.inputfiles:
         file_name_parts = input_file.name.rpartition('.')
         cropped_file_name = file_name_parts[0] + '-tmp1.' + file_name_parts[2]
         scaled_file_name = file_name_parts[0] + '-tmp2.' + file_name_parts[2]
-        output_file_name = file_name_parts[0] + '-a4.' + file_name_parts[2]
+
+        if args.output is None or len(args.inputfiles) > 1:
+            output_file_name = file_name_parts[0] + '-a4.' + file_name_parts[2]
+        else:
+            output_file_name = args.output
 
         # Crop margins
         subprocess.check_call(['pdfcrop', input_file.name, cropped_file_name])
@@ -35,6 +48,10 @@ if __name__ == '__main__':
 
         # Add margins
         subprocess.check_call(['pdfcrop', '--margins', args.margins, '--noclip', scaled_file_name, output_file_name])
+
+        # Open print dialog
+        if args.open_print_dialog:
+            subprocess.check_call(['okular', '--print', output_file_name])
 
         # Remove temporary files
         os.remove(cropped_file_name)
