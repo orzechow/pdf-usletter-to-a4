@@ -23,6 +23,11 @@ This python skript converts US letter PDFs to A4 PDFs using ghostscript and pdfc
 * ghostscript
 * okular (for `--print` option)
 
+## Installation
+The *pdf-usletter-to-a4* script can be used right away without installation.
+
+If you want to add a context menu entry like "Open With..." → "Print as A4", make sure the script is in your PATH and add the *pdf-usletter-to-a4.desktop* file to your `~/.local/share/applications/` folder.
+
 ## License
 
 Copyright © 2016 Piotr Orzechowski. This software is released under the MIT License.

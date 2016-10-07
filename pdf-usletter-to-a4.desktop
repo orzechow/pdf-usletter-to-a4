@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Print as A4
+Comment=Convert US letter PDFs to A4 PDFs and print with Okular.
+Exec=pdf-usletter-to-a4 --output /tmp/pdf-usletter-to-a4.pdf --print %f
+Type=Application
+Icon=document-print
+MimeType=text/pdf;application/pdf;application/x-pdf
